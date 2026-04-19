@@ -1,0 +1,30 @@
+{
+  "entities": {
+    "Verification": {
+      "title": "News Verification",
+      "description": "Results of news analysis for a user",
+      "type": "object",
+      "properties": {
+        "userId": { "type": "string" },
+        "content": { "type": "string" },
+        "result": {
+          "type": "object",
+          "properties": {
+            "truthScore": { "type": "number" },
+            "verdict": { "type": "string" },
+            "explanation": { "type": "string" },
+            "keyPoints": { "type": "array", "items": { "type": "string" } }
+          }
+        },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["userId", "content", "result", "timestamp"]
+    }
+  },
+  "firestore": {
+    "/verifications/{verificationId}": {
+      "schema": "Verification",
+      "description": "Collection of all news verifications performed by users."
+    }
+  }
+}

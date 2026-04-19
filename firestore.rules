@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    match /verifications/{verificationId} {
+      function isValidVerification(data) {
+        return data.userId is string &&
+               data.content is string && data.content.size() <= 5000 &&
+               data.result is map &&
+               data.result.truthScore is number &&
+               data.result.verdict is string &&
+               data.timestamp is timestamp;
+      }
+
+      allow create: if isSignedIn() && 
+                      isValidId(verificationId) &&
+                      isValidVerification(incoming()) &&
+                      incoming().userId == request.auth.uid &&
+                      incoming().timestamp == request.time;
+      
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      
+      allow delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+  }
+}

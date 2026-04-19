@@ -1,0 +1,6 @@
+{
+  "name": "TruthLens AI – Fake News Detection System",
+  "description": "An AI-powered news verification tool that detects misinformation using Google Gemini.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
